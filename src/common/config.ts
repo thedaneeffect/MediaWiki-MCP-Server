@@ -18,6 +18,11 @@ export interface WikiConfig {
 	 */
 	scriptpath: string;
 	/**
+	 * Custom REST API path. Defaults to ${scriptpath}/rest.php if not set.
+	 * Use this when your wiki has a non-standard REST API location.
+	 */
+	restpath?: string;
+	/**
 	 * OAuth consumer token requested from Extension:OAuth.
 	 */
 	token?: string | null;

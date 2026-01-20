@@ -51,10 +51,10 @@ async function getCookiesFromJar(): Promise<string | undefined> {
 		return undefined;
 	}
 
-	const { server, scriptpath } = wikiService.getCurrent().config;
+	const { server, scriptpath, restpath } = wikiService.getCurrent().config;
 
 	// Get cookies for the REST API URL
-	const restApiUrl = `${ server }${ scriptpath }/rest.php`;
+	const restApiUrl = restpath ? `${ server }${ restpath }` : `${ server }${ scriptpath }/rest.php`;
 	const cookies = cookieJar.getCookieStringSync( restApiUrl );
 
 	if ( cookies ) {
@@ -63,6 +63,11 @@ async function getCookiesFromJar(): Promise<string | undefined> {
 
 	// Fallback: try getting cookies for the domain
 	return cookieJar.getCookieStringSync( server ) || undefined;
+}
+
+function getRestApiBase(): string {
+	const { server, scriptpath, restpath } = wikiService.getCurrent().config;
+	return restpath ? `${ server }${ restpath }` : `${ server }${ scriptpath }/rest.php`;
 }
 
 async function fetchCore(
@@ -138,9 +143,7 @@ export async function makeRestGetRequest<T>(
 		needAuth
 	);
 
-	const { server, scriptpath } = wikiService.getCurrent().config;
-
-	const response = await fetchCore( `${ server }${ scriptpath }/rest.php${ path }`, {
+	const response = await fetchCore( `${ getRestApiBase() }${ path }`, {
 		params,
 		headers: authHeaders
 	} );
@@ -163,9 +166,7 @@ export async function makeRestPutRequest<T>(
 		needAuth
 	);
 
-	const { server, scriptpath } = wikiService.getCurrent().config;
-
-	const response = await fetchCore( `${ server }${ scriptpath }/rest.php${ path }`, {
+	const response = await fetchCore( `${ getRestApiBase() }${ path }`, {
 		headers: authHeaders,
 		method: 'PUT',
 		body: authBody
@@ -189,9 +190,7 @@ export async function makeRestPostRequest<T>(
 		needAuth
 	);
 
-	const { server, scriptpath } = wikiService.getCurrent().config;
-
-	const response = await fetchCore( `${ server }${ scriptpath }/rest.php${ path }`, {
+	const response = await fetchCore( `${ getRestApiBase() }${ path }`, {
 		headers: authHeaders,
 		method: 'POST',
 		body: authBody
